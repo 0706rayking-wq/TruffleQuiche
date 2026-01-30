@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>廚房管理門戶</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .active-scale:active { transform: scale(0.96); transition: 0.1s; }
+        details summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div id="home" class="tab-content active">
+        <div class="relative h-48 w-full bg-slate-900 overflow-hidden shadow-lg">
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800" class="w-full h-full object-cover opacity-50">
+            <div class="absolute bottom-6 left-6 text-white">
+                <h1 class="text-2xl font-bold">廚房管理門戶</h1>
+                <p class="text-slate-300 text-xs mt-1">Kitchen Operational Portal</p>
+            </div>
+        </div>
+
+        <main class="max-w-md mx-auto p-5 -mt-4 relative z-10">
+            <div class="bg-white rounded-3xl shadow-sm p-5 mb-6 border border-slate-100">
+                <h2 class="font-bold mb-3 flex items-center text-orange-600 text-sm">
+                    <i class="fas fa-bullhorn mr-2"></i>最新營運公告
+                </h2>
+                <div id="announcement-list" class="space-y-3">
+                    <p class="text-center text-slate-400 text-xs italic">公告同步中...</p>
+                </div>
+            </div>
+
+            <div class="space-y-6 pb-12">
+                <div>
+                    <h2 class="text-sm font-bold mb-3 px-1 text-slate-500">規範與福利</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="showPage('rules')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
+                            <i class="fas fa-shield-alt text-xl mb-2 text-green-500"></i>
+                            <span class="text-xs font-bold">員工守則</span>
+                        </button>
+                        <button onclick="showPage('benefits')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
+                            <i class="fas fa-gift text-xl mb-2 text-pink-500"></i>
+                            <span class="text-xs font-bold">薪資福利</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-sm font-bold mb-3 px-1 text-slate-500">日常營運工具</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="showPage('schedule')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
+                            <i class="fas fa-calendar-alt text-xl mb-2 text-blue-500"></i>
+                            <span class="text-xs font-bold">每月班表</span>
+                        </button>
+                        <button onclick="showPage('checklist')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
+                            <i class="fas fa-tasks text-xl mb-2 text-amber-500"></i>
+                            <span class="text-xs font-bold">善後巡視</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="rules" class="tab-content min-h-screen bg-slate-50 pb-20">
+        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20 shadow-sm">
+            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
+            <h2 class="text-lg font-bold">員工守則規範</h2>
+        </nav>
+        <div class="p-5 space-y-4 text-sm">
+            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
+                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-orange-50/20">食品衛生安全</summary>
+                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed">
+                    <p>• 體檢除一般項目外，應包括胸部X光及A型肝炎抗體檢驗 [cite: 3]。</p>
+                    <p>• 食材應離牆 5 公分，離地 20 公分 [cite: 4]。</p>
+                    <p>• 冷凍冷藏生熟食分開，砧板刀具應區分 [cite: 6, 7]。</p>
+                    <p>• 細菌易生溫度 16~59 度，處理食材宜加熱或保冰 [cite: 18, 19]。</p>
+                </div>
+            </details>
+            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
+                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-blue-50/20">廚房工作守則</summary>
+                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed">
+                    <p>• 需著裝、置物完畢後再打卡，否則視同遲到 [cite: 40]。</p>
+                    <p>• 上班時間禁止使用手機 [cite: 43]。</p>
+                    <p>• 禁抽菸、檳榔、口香糖、喝酒 [cite: 55, 56]。</p>
+                    <p>• 如廁時間限 6 分鐘 [cite: 57]。</p>
+                </div>
+            </details>
+            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
+                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-red-50/20">職場安全守則</summary>
+                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed text-[13px]">
+                    <p>• <b>切肉機：</b>須用推肉板，清潔前必拔電源 [cite: 69, 72]。</p>
+                    <p>• <b>瓦斯爐：</b>開瓦斯→點火→關火→關瓦斯 [cite: 122]。</p>
+                    <p>• <b>蒸烤箱：</b>開門先退後一步，避免蒸氣灼傷 [cite: 138]。</p>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <div id="benefits" class="tab-content min-h-screen bg-slate-50 pb-20">
+        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
+            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
+            <h2 class="text-lg font-bold">薪資福利</h2>
+        </nav>
+        <div class="p-5 space-y-4">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-pink-100">
+                <h3 class="font-bold text-pink-600 mb-2">💰 薪酬待遇</h3>
+                <p class="text-sm text-slate-600">包含本薪、全勤獎金及績效獎金，詳情請參閱個人聘僱合約。</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-pink-100">
+                <h3 class="font-bold text-pink-600 mb-2">🎁 員工福利</h3>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• 免費員工供膳</li>
+                    <li>• 年度員工聚餐</li>
+                    <li>• 節慶禮券/獎金</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="schedule" class="tab-content min-h-screen bg-slate-50 pb-20">
+        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
+            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
+            <h2 class="text-lg font-bold">每月班表查詢</h2>
+        </nav>
+        <div class="p-5">
+            <div class="bg-white rounded-3xl shadow-sm overflow-hidden p-4 min-h-[400px] flex items-center justify-center">
+                <p class="text-slate-400 text-sm">（可在此處嵌入 Google 日曆或上傳班表圖片）</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="checklist" class="tab-content min-h-screen bg-slate-50 pb-20">
+        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
+            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
+            <h2 class="text-lg font-bold">善後巡視系統</h2>
+        </nav>
+        <div class="p-5 space-y-4">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-100">
+                <h3 class="font-bold text-amber-600 mb-4 text-center">每日收尾檢查</h3>
+                <div class="space-y-4">
+                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
+                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">水電瓦斯關閉確認 [cite: 52]</span>
+                    </label>
+                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
+                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">冰箱門確切關閉 </span>
+                    </label>
+                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
+                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">垃圾與回收堆疊整齊 </span>
+                    </label>
+                    <button class="w-full bg-amber-500 text-white font-bold py-4 rounded-2xl shadow-lg mt-4">提交巡視結果</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "你的_GOOGLE_WEB_APP_網址"; 
+
+        function showPage(id) {
+            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        async function loadAnnouncements() {
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                document.getElementById('announcement-list').innerHTML = data.map(item => `
+                    <div class="p-4 border-l-4 border-orange-500 bg-slate-50 rounded-r-xl">
+                        <h3 class="font-bold text-slate-800 text-sm">${item.Title}</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">${item.Content}</p>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('announcement-list').innerHTML = "<p class='text-center text-slate-300 text-xs'>暫無公告</p>";
+            }
+        }
+
+        window.onload = loadAnnouncements;
+    </script>
+</body>
+</html>
