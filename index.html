@@ -1,189 +1,374 @@
+<!-- Chosen Palette: Boulangerie Warmth (Stone, Cream, Golden Crust, Slate) -->
+<!-- Application Structure Plan:
+    1.  **Header & Configuration**: 標題與全局「份量計算器」和「單位切換」。
+    2.  **Dashboard Grid**:
+        * **左側 (Mise en Place)**: 動態食材清單，分為「派殼」、「蛋奶液」、「內餡」三大類，隨份量計算器即時更動。
+        * **右側 (The Science)**: 包含比例圓餅圖（展示蛋奶液成分）與更新後的時間管理條形圖。
+    3.  **Interactive Process (The Workbench)**: 標籤頁界面，將流程分為四個階段（麵團、整形、盲烤、填餡烘烤）。
+    4.  **Pro Tips (Chef's Notes)**: 針對新增的奶油乳酪混合與松露風味加入技術提醒。
+    
+    Why this structure? 新增了複雜的蛋奶液與填餡步驟後，分門別類地展示食材與工序能有效降低出錯率。
+-->
+<!-- Visualization & Content Choices:
+    1.  **蛋奶液比例分析**: Donut Chart (Chart.js)。目標：展示奶油乳酪、鮮奶油與松露醬的黃金比例。
+    2.  **完整製作時序**: Horizontal Bar Chart (Chart.js)。目標：包含最後 15 分鐘的關鍵烘烤期。
+    3.  **步驟追蹤**: 互動式清單，新增 Stage 4。
+    
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+-->
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>廚房管理門戶</title>
+    <title>黑松露奶油乳酪鹹派大師班 | Black Truffle Quiche Masterclass</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .active-scale:active { transform: scale(0.96); transition: 0.1s; }
-        details summary::-webkit-details-marker { display: none; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800">
-
-    <div id="home" class="tab-content active">
-        <div class="relative h-48 w-full bg-slate-900 overflow-hidden shadow-lg">
-            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800" class="w-full h-full object-cover opacity-50">
-            <div class="absolute bottom-6 left-6 text-white">
-                <h1 class="text-2xl font-bold">廚房管理門戶</h1>
-                <p class="text-slate-300 text-xs mt-1">Kitchen Operational Portal</p>
-            </div>
-        </div>
-
-        <main class="max-w-md mx-auto p-5 -mt-4 relative z-10">
-            <div class="bg-white rounded-3xl shadow-sm p-5 mb-6 border border-slate-100">
-                <h2 class="font-bold mb-3 flex items-center text-orange-600 text-sm">
-                    <i class="fas fa-bullhorn mr-2"></i>最新營運公告
-                </h2>
-                <div id="announcement-list" class="space-y-3">
-                    <p class="text-center text-slate-400 text-xs italic">公告同步中...</p>
-                </div>
-            </div>
-
-            <div class="space-y-6 pb-12">
-                <div>
-                    <h2 class="text-sm font-bold mb-3 px-1 text-slate-500">規範與福利</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="showPage('rules')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-                            <i class="fas fa-shield-alt text-xl mb-2 text-green-500"></i>
-                            <span class="text-xs font-bold">員工守則</span>
-                        </button>
-                        <button onclick="showPage('benefits')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-                            <i class="fas fa-gift text-xl mb-2 text-pink-500"></i>
-                            <span class="text-xs font-bold">薪資福利</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <h2 class="text-sm font-bold mb-3 px-1 text-slate-500">日常營運工具</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="showPage('schedule')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-                            <i class="fas fa-calendar-alt text-xl mb-2 text-blue-500"></i>
-                            <span class="text-xs font-bold">每月班表</span>
-                        </button>
-                        <button onclick="showPage('checklist')" class="active-scale bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-                            <i class="fas fa-tasks text-xl mb-2 text-amber-500"></i>
-                            <span class="text-xs font-bold">善後巡視</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="rules" class="tab-content min-h-screen bg-slate-50 pb-20">
-        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20 shadow-sm">
-            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
-            <h2 class="text-lg font-bold">員工守則規範</h2>
-        </nav>
-        <div class="p-5 space-y-4 text-sm">
-            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
-                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-orange-50/20">食品衛生安全</summary>
-                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed">
-                    <p>• 體檢除一般項目外，應包括胸部X光及A型肝炎抗體檢驗 [cite: 3]。</p>
-                    <p>• 食材應離牆 5 公分，離地 20 公分 [cite: 4]。</p>
-                    <p>• 冷凍冷藏生熟食分開，砧板刀具應區分 [cite: 6, 7]。</p>
-                    <p>• 細菌易生溫度 16~59 度，處理食材宜加熱或保冰 [cite: 18, 19]。</p>
-                </div>
-            </details>
-            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
-                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-blue-50/20">廚房工作守則</summary>
-                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed">
-                    <p>• 需著裝、置物完畢後再打卡，否則視同遲到 [cite: 40]。</p>
-                    <p>• 上班時間禁止使用手機 [cite: 43]。</p>
-                    <p>• 禁抽菸、檳榔、口香糖、喝酒 [cite: 55, 56]。</p>
-                    <p>• 如廁時間限 6 分鐘 [cite: 57]。</p>
-                </div>
-            </details>
-            <details class="bg-white rounded-2xl shadow-sm border overflow-hidden group">
-                <summary class="p-5 flex justify-between items-center cursor-pointer font-bold bg-red-50/20">職場安全守則</summary>
-                <div class="p-5 pt-2 space-y-3 text-slate-700 border-t leading-relaxed text-[13px]">
-                    <p>• <b>切肉機：</b>須用推肉板，清潔前必拔電源 [cite: 69, 72]。</p>
-                    <p>• <b>瓦斯爐：</b>開瓦斯→點火→關火→關瓦斯 [cite: 122]。</p>
-                    <p>• <b>蒸烤箱：</b>開門先退後一步，避免蒸氣灼傷 [cite: 138]。</p>
-                </div>
-            </details>
-        </div>
-    </div>
-
-    <div id="benefits" class="tab-content min-h-screen bg-slate-50 pb-20">
-        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
-            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
-            <h2 class="text-lg font-bold">薪資福利</h2>
-        </nav>
-        <div class="p-5 space-y-4">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-pink-100">
-                <h3 class="font-bold text-pink-600 mb-2">💰 薪酬待遇</h3>
-                <p class="text-sm text-slate-600">包含本薪、全勤獎金及績效獎金，詳情請參閱個人聘僱合約。</p>
-            </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-pink-100">
-                <h3 class="font-bold text-pink-600 mb-2">🎁 員工福利</h3>
-                <ul class="text-sm text-slate-600 space-y-2">
-                    <li>• 免費員工供膳</li>
-                    <li>• 年度員工聚餐</li>
-                    <li>• 節慶禮券/獎金</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="schedule" class="tab-content min-h-screen bg-slate-50 pb-20">
-        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
-            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
-            <h2 class="text-lg font-bold">每月班表查詢</h2>
-        </nav>
-        <div class="p-5">
-            <div class="bg-white rounded-3xl shadow-sm overflow-hidden p-4 min-h-[400px] flex items-center justify-center">
-                <p class="text-slate-400 text-sm">（可在此處嵌入 Google 日曆或上傳班表圖片）</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="checklist" class="tab-content min-h-screen bg-slate-50 pb-20">
-        <nav class="p-4 border-b bg-white flex items-center sticky top-0 z-20">
-            <button onclick="showPage('home')" class="text-slate-600 mr-4 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
-            <h2 class="text-lg font-bold">善後巡視系統</h2>
-        </nav>
-        <div class="p-5 space-y-4">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-100">
-                <h3 class="font-bold text-amber-600 mb-4 text-center">每日收尾檢查</h3>
-                <div class="space-y-4">
-                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
-                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">水電瓦斯關閉確認 [cite: 52]</span>
-                    </label>
-                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
-                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">冰箱門確切關閉 </span>
-                    </label>
-                    <label class="flex items-center p-3 bg-slate-50 rounded-xl">
-                        <input type="checkbox" class="w-5 h-5 mr-3"> <span class="text-sm">垃圾與回收堆疊整齊 </span>
-                    </label>
-                    <button class="w-full bg-amber-500 text-white font-bold py-4 rounded-2xl shadow-lg mt-4">提交巡視結果</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        const SCRIPT_URL = "你的_GOOGLE_WEB_APP_網址"; 
-
-        function showPage(id) {
-            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            window.scrollTo(0, 0);
-        }
-
-        async function loadAnnouncements() {
-            try {
-                const res = await fetch(SCRIPT_URL);
-                const data = await res.json();
-                document.getElementById('announcement-list').innerHTML = data.map(item => `
-                    <div class="p-4 border-l-4 border-orange-500 bg-slate-50 rounded-r-xl">
-                        <h3 class="font-bold text-slate-800 text-sm">${item.Title}</h3>
-                        <p class="text-[11px] text-slate-500 mt-1">${item.Content}</p>
-                    </div>
-                `).join('');
-            } catch (e) {
-                document.getElementById('announcement-list').innerHTML = "<p class='text-center text-slate-300 text-xs'>暫無公告</p>";
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'crust-base': '#FDFBF7', 
+                        'crust-gold': '#D4A373', 
+                        'crust-dark': '#4A403A', 
+                        'crust-accent': '#CCD5AE', 
+                        'crust-highlight': '#E9EDC9',
+                        'truffle-black': '#2D2926',
+                    },
+                    fontFamily: {
+                        sans: ['Helvetica Neue', 'Arial', 'Noto Sans TC', 'sans-serif'],
+                    }
+                }
             }
         }
+    </script>
 
-        window.onload = loadAnnouncements;
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #D4A373; border-radius: 4px; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (min-width: 768px) { .chart-container { height: 320px; } }
+
+        .step-checkbox:checked + span {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #D4A373;
+            color: #4A403A;
+            font-weight: bold;
+        }
+        
+        .tab-inactive { color: #9CA3AF; }
+        .tab-inactive:hover { color: #D4A373; }
+
+        .ing-category-tag {
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-crust-base text-crust-dark font-sans leading-relaxed">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="text-4xl">🥧</div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 tracking-tight">黑松露乳酪鹹派全攻略</h1>
+                    <p class="text-sm text-gray-500">法式派殼 x 黑松露奶油乳酪蛋奶液</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6 bg-stone-50 px-4 py-2 rounded-lg border border-stone-200">
+                <div class="flex flex-col items-center">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">製作倍數</label>
+                    <div class="flex items-center gap-3">
+                        <button onclick="updateYield(-0.5)" class="w-8 h-8 rounded-full bg-white border border-gray-300 hover:bg-crust-gold hover:text-white transition shadow-sm flex items-center justify-center font-bold text-lg">－</button>
+                        <span id="yield-display" class="font-mono text-xl w-12 text-center font-bold">1.0</span>
+                        <button onclick="updateYield(0.5)" class="w-8 h-8 rounded-full bg-white border border-gray-300 hover:bg-crust-gold hover:text-white transition shadow-sm flex items-center justify-center font-bold text-lg">＋</button>
+                    </div>
+                </div>
+                <div class="h-8 w-px bg-gray-300"></div>
+                <div class="flex flex-col items-center">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">溫度單位</label>
+                    <button id="temp-toggle" onclick="toggleTemp()" class="text-sm font-bold bg-white border border-gray-300 px-3 py-1 rounded shadow-sm hover:bg-stone-100 min-w-[60px]">200°C</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+        <!-- Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left: Ingredients -->
+            <div class="lg:col-span-5">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 h-full overflow-hidden">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">🥣 全材料清單 (Mise en Place)</h2>
+                    <div class="space-y-6 max-h-[600px] overflow-y-auto pr-2" id="ingredients-container">
+                        <!-- Categories and items will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Charts -->
+            <div class="lg:col-span-7">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 h-full">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">📊 烘焙數據可視化</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col">
+                            <h3 class="text-sm font-bold text-center text-gray-400 uppercase mb-2">蛋奶液比例 (Custard)</h3>
+                            <div class="chart-container bg-stone-50 rounded-xl p-2"><canvas id="ratioChart"></canvas></div>
+                        </div>
+                        <div class="flex flex-col">
+                            <h3 class="text-sm font-bold text-center text-gray-400 uppercase mb-2">完整時間線 (分)</h3>
+                            <div class="chart-container bg-stone-50 rounded-xl p-2"><canvas id="timeChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-stone-50 rounded-xl border border-stone-200 text-xs text-stone-500 italic">
+                        * 時間線包含「麵團鬆弛」、「盲烤」與「最終烘烤」。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workbench (Tabs) -->
+        <section class="bg-white rounded-2xl shadow-lg border border-stone-100 overflow-hidden">
+            <div class="flex border-b border-gray-200 bg-stone-50 overflow-x-auto">
+                <button onclick="switchTab('stage1')" id="tab-stage1" class="flex-1 py-4 px-4 text-center text-sm font-medium whitespace-nowrap tab-active">Stage 1. 麵團製作</button>
+                <button onclick="switchTab('stage2')" id="tab-stage2" class="flex-1 py-4 px-4 text-center text-sm font-medium whitespace-nowrap tab-inactive">Stage 2. 整形入模</button>
+                <button onclick="switchTab('stage3')" id="tab-stage3" class="flex-1 py-4 px-4 text-center text-sm font-medium whitespace-nowrap tab-inactive">Stage 3. 盲烤程序</button>
+                <button onclick="switchTab('stage4')" id="tab-stage4" class="flex-1 py-4 px-4 text-center text-sm font-medium whitespace-nowrap tab-inactive">Stage 4. 填餡烘烤</button>
+            </div>
+
+            <div class="p-6 md:p-8 min-h-[400px]">
+                <div id="content-stage1" class="space-y-4">
+                    <ul class="space-y-4" id="list-stage1"></ul>
+                </div>
+                <div id="content-stage2" class="hidden space-y-4">
+                    <ul class="space-y-4" id="list-stage2"></ul>
+                </div>
+                <div id="content-stage3" class="hidden space-y-4">
+                    <ul class="space-y-4" id="list-stage3"></ul>
+                </div>
+                <div id="content-stage4" class="hidden space-y-4">
+                    <ul class="space-y-4" id="list-stage4"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pro Tips -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-xl border-t-4 border-truffle-black shadow-sm">
+                <h3 class="font-bold mb-2">🍄 松露拌勻技巧</h3>
+                <p class="text-sm text-gray-600">奶油乳酪建議退冰至室溫，先分次加入雞蛋拌勻至無顆粒狀，再加入松露醬與鮮奶油，口感最細緻。</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border-t-4 border-red-400 shadow-sm">
+                <h3 class="font-bold mb-2">🥓 填餡順序</h3>
+                <p class="text-sm text-gray-600">培根與蘑菇建議先炒乾水分，鋪在派底後再淋入蛋奶液，能避免派皮因內餡過濕而軟掉。</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border-t-4 border-yellow-400 shadow-sm">
+                <h3 class="font-bold mb-2">🧀 最終色澤</h3>
+                <p class="text-sm text-gray-600">撒上帕瑪森粉後烘烤，除了增加鹹香味，還能讓派皮頂部呈現漂亮的脆皮質感。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const categories = {
+            crust: { title: "派殼材料 (Crust)", color: "bg-crust-gold text-white" },
+            custard: { title: "黑松露蛋奶液 (Custard)", color: "bg-truffle-black text-white" },
+            fillings: { title: "經典鹹派料 (Fillings)", color: "bg-crust-accent text-crust-dark" }
+        };
+
+        const ingredients = [
+            // Crust
+            { category: "crust", name: "中筋麵粉", qty: 1000, unit: "g", icon: "🌾" },
+            { category: "crust", name: "冰無鹽奶油", qty: 1000, unit: "g", icon: "🧈" },
+            { category: "crust", name: "鹽", qty: 15, unit: "g", icon: "🧂" },
+            { category: "crust", name: "全蛋", qty: 10, unit: "顆", icon: "🥚" },
+            { category: "crust", name: "冰水", qty: 300, unit: "cc", icon: "💧" },
+            
+            // Custard
+            { category: "custard", name: "奶油乳酪", qty: 200, unit: "g", icon: "🧀" },
+            { category: "custard", name: "鮮奶油", qty: 150, unit: "g", icon: "🥛" },
+            { category: "custard", name: "雞蛋 (蛋奶液用)", qty: 2, unit: "顆", icon: "🥚" },
+            { category: "custard", name: "黑松露醬", qty: 130, unit: "g", icon: "🍄" },
+            { category: "custard", name: "鹽巴/黑胡椒", qty: 3, unit: "g", icon: "🧂" },
+
+            // Fillings
+            { category: "fillings", name: "蒜碎/洋蔥丁", qty: 0, unit: "適量", icon: "🧄" },
+            { category: "fillings", name: "厚切培根", qty: 0, unit: "適量", icon: "🥓" },
+            { category: "fillings", name: "蘑菇片", qty: 0, unit: "適量", icon: "🍄" },
+            { category: "fillings", name: "乳酪絲/帕瑪森粉", qty: 0, unit: "適量", icon: "🧀" }
+        ];
+
+        const steps = {
+            stage1: [
+                "將冰奶油切丁，回歸冷凍備用。",
+                "麵粉與鹽拌勻，加入奶油丁裹粉。",
+                "用指尖或切刀將奶油搓成麵包屑狀（砂礫狀）。",
+                "中間挖槽倒入蛋液與冰水，輕拌至成團即可。",
+                "包入塑膠袋壓平，冷凍 30 分鐘。"
+            ],
+            stage2: [
+                "撒手粉，將麵團擀至大於烤盤 3-5 公分。",
+                "移至烤盤，輕壓轉角使其貼合，剪去多餘邊緣。",
+                "再次冷凍 20 分鐘（防止烘烤回縮）。"
+            ],
+            stage3: [
+                "派皮底部戳小孔，鋪上烘焙紙與壓石。",
+                "放入預熱好的烤箱，以 200℃ 烘烤 20 分鐘。",
+                "移除壓石與紙，表面刷上蛋黃液封口。",
+                "放回烤箱續烤 5 分鐘，確保派皮乾爽。"
+            ],
+            stage4: [
+                "**製作蛋奶液**：奶油乳酪室溫軟化，分次加入雞蛋拌勻。",
+                "混合剩餘材料：加入鮮奶油、黑松露醬、鹽與黑胡椒充分結合。",
+                "**準備填餡**：將培根、蘑菇、洋蔥與蒜碎先炒香並瀝乾水分。",
+                "**填入內餡**：在烤好的派殼中鋪入鹹派料，灌入黑松露蛋奶液。",
+                "**最終烘烤**：鋪上乳酪絲並撒上帕瑪森粉，回爐烘烤 15 分鐘至金黃誘人。"
+            ]
+        };
+
+        let currentYield = 1.0;
+        let isCelsius = true;
+
+        function renderIngredients() {
+            const container = document.getElementById('ingredients-container');
+            container.innerHTML = '';
+
+            Object.keys(categories).forEach(catKey => {
+                const catInfo = categories[catKey];
+                const section = document.createElement('div');
+                section.innerHTML = `
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="ing-category-tag ${catInfo.color}">${catInfo.title}</span>
+                        <div class="flex-1 h-px bg-stone-100"></div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        ${ingredients.filter(i => i.category === catKey).map(ing => `
+                            <div class="flex items-center justify-between p-2 hover:bg-stone-50 rounded-lg group transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="w-4 h-4 accent-crust-gold rounded border-gray-300">
+                                    <span class="text-sm text-gray-700">${ing.icon} ${ing.name}</span>
+                                </div>
+                                <span class="text-sm font-bold text-stone-500">${ing.qty > 0 ? Math.round(ing.qty * currentYield) : ''} ${ing.unit}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+
+        function renderSteps() {
+            Object.keys(steps).forEach(stage => {
+                const list = document.getElementById(`list-${stage}`);
+                list.innerHTML = steps[stage].map((text, i) => `
+                    <li class="flex gap-4 p-3 rounded-lg hover:bg-stone-50 transition cursor-pointer" onclick="this.querySelector('input').click()">
+                        <div class="flex flex-col items-center pt-1 min-w-[20px]">
+                            <span class="text-[10px] font-bold text-stone-300">#${i+1}</span>
+                            <div class="w-px flex-1 bg-stone-100 my-1"></div>
+                        </div>
+                        <label class="flex items-start gap-3 flex-1 cursor-pointer">
+                            <input type="checkbox" class="mt-1 w-4 h-4 accent-crust-gold step-checkbox">
+                            <span class="text-sm text-gray-700 leading-relaxed">${text}</span>
+                        </label>
+                    </li>
+                `).join('');
+            });
+        }
+
+        function updateYield(val) {
+            currentYield = Math.max(0.5, currentYield + val);
+            document.getElementById('yield-display').innerText = currentYield.toFixed(1);
+            renderIngredients();
+            // Data in charts is relative/proportional, so we don't necessarily update them unless showing absolute values
+        }
+
+        function toggleTemp() {
+            isCelsius = !isCelsius;
+            const temp = isCelsius ? 200 : 392;
+            document.getElementById('temp-toggle').innerText = `${temp}°${isCelsius?'C':'F'}`;
+            document.querySelectorAll('.temp-val').forEach(el => el.innerText = temp);
+            document.querySelectorAll('.temp-unit').forEach(el => el.innerText = `°${isCelsius?'C':'F'}`);
+        }
+
+        function switchTab(id) {
+            ['stage1', 'stage2', 'stage3', 'stage4'].forEach(s => {
+                document.getElementById(`content-${s}`).classList.add('hidden');
+                document.getElementById(`tab-${s}`).className = 'flex-1 py-4 text-center text-sm font-medium tab-inactive';
+            });
+            document.getElementById(`content-${id}`).classList.remove('hidden');
+            document.getElementById(`tab-${id}`).className = 'flex-1 py-4 text-center text-sm font-medium tab-active';
+        }
+
+        function initCharts() {
+            const ratioCtx = document.getElementById('ratioChart').getContext('2d');
+            new Chart(ratioCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['奶油乳酪', '鮮奶油', '黑松露醬', '雞蛋'],
+                    datasets: [{ 
+                        data: [200, 150, 130, 100], 
+                        backgroundColor: ['#4A403A', '#D4A373', '#2D2926', '#E9EDC9'], 
+                        borderWidth: 0 
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 10} } } } }
+            });
+
+            const timeCtx = document.getElementById('timeChart').getContext('2d');
+            new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['混合', '鬆弛', '整形', '冷凍', '盲烤', '最終烤'],
+                    datasets: [{ 
+                        label: '分鐘',
+                        data: [15, 30, 15, 20, 25, 15], 
+                        backgroundColor: ['#D4A373', '#CCD5AE', '#D4A373', '#CCD5AE', '#4A403A', '#2D2926'],
+                        borderRadius: 4 
+                    }]
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { x: { display: false }, y: { grid: { display: false } } },
+                    plugins: { legend: { display: false } } 
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIngredients();
+            renderSteps();
+            initCharts();
+        });
     </script>
 </body>
 </html>
